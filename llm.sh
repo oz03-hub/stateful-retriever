@@ -9,12 +9,13 @@
 #SBATCH -e logs/log-%j.err  # %j = job ID
 #SBATCH --account=pi_hzamani_umass_edu
 
-module add cuda/11.8 #12.1
+module add cuda/13.1  # must be >=12 to match the cu13 torch/flashinfer in the env; 11.8 breaks flashinfer JIT
 module add conda/latest
 
 conda activate myenv
 
-PORT=9000
+# Ask the OS for a free ephemeral port so concurrent/leftover jobs don't collide on 9000
+PORT=$(python3 -c 'import socket; s=socket.socket(); s.bind(("", 0)); print(s.getsockname()[1]); s.close()')
 FQDN=$(hostname -f)
 
 echo "Hostname: $(hostname)"
